@@ -1287,3 +1287,84 @@ body.dashboard-active .how-section {
     border-radius: 50%;
     box-shadow: 0 0 5px var(--accent-gold);
 }
+
+/* Legal & Compliance */
+.footer-legal {
+    display: flex;
+    gap: var(--space-lg);
+    justify-content: center;
+    margin: var(--space-lg) 0;
+    flex-wrap: wrap;
+}
+
+.footer-legal .legal-link {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.footer-legal .legal-link:hover {
+    color: var(--text-primary);
+}
+
+.legal-scroll-area {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: var(--space-md);
+    margin: var(--space-xl) 0;
+    text-align: left;
+}
+
+.legal-scroll-area h2 {
+    color: var(--accent-gold);
+    margin-bottom: var(--space-lg);
+}
+
+.legal-scroll-area h3 {
+    margin-top: var(--space-xl);
+    margin-bottom: var(--space-sm);
+    color: var(--text-secondary);
+}
+
+.legal-scroll-area p,
+.legal-scroll-area ul {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: var(--space-md);
+}
+
+.legal-scroll-area ul {
+    padding-left: var(--space-xl);
+}
+
+/* Checkbox Styling */
+.term-group {
+    margin: var(--space-lg) 0;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    user-select: none;
+}
+
+.checkbox-container input {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.checkbox-container a {
+    color: var(--accent-gold);
+    text-decoration: none;
+}
+
+.checkbox-container a:hover {
+    text-decoration: underline;
+}

@@ -260,6 +260,48 @@ function hideLoadingOverlay() {
 }
 
 // ============================================
+// LEGAL MODAL & COMPLIANCE
+// ============================================
+function openLegalDoc(docKey) {
+    const contentArea = document.getElementById('legal-content-area');
+    const legalModal = document.getElementById('legal-modal');
+
+    if (window.legalDocs && window.legalDocs[docKey]) {
+        contentArea.innerHTML = window.legalDocs[docKey];
+        legalModal.classList.add('active');
+    }
+}
+
+// Bind legal links
+document.querySelectorAll('.legal-link').forEach(link => {
+    link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const docKey = link.getAttribute('data-doc');
+        openLegalDoc(docKey);
+    });
+});
+
+// Update Registration logic to check T&C
+const originalRegisterSubmit = document.getElementById('register-form');
+if (originalRegisterSubmit) {
+    originalRegisterSubmit.addEventListener('submit', (e) => {
+        const termsCheckbox = document.getElementById('register-terms');
+        if (termsCheckbox && !termsCheckbox.checked) {
+            e.preventDefault();
+            e.stopPropagation();
+            alert("Please agree to the Terms and Conditions to proceed.");
+        }
+    }, true); // Use capture to intercept before auth.js
+}
+
+// Global modal close on background click
+window.addEventListener('click', (e) => {
+    if (e.target.classList.contains('modal')) {
+        e.target.classList.remove('active');
+    }
+});
+
+// ============================================
 // DASHBOARD RENDERING
 // ============================================
 window.renderDashboard = function (analysis) {
@@ -291,6 +333,7 @@ window.renderDashboard = function (analysis) {
         </div>
     `;
 
+
     // Bind restart button
     document.getElementById('restart-btn')?.addEventListener('click', restart);
 
@@ -300,21 +343,21 @@ window.renderDashboard = function (analysis) {
 
 function renderDashboardHeader(analysis) {
     return `
-        <div class="dashboard-header">
+        < div class="dashboard-header" >
             <div class="dashboard-title-area">
                 <h1>🎯 Your AI-Powered Escape Plan</h1>
                 <p class="dashboard-subtitle">Personalized roadmap from <strong>${state.userData.currentTitle || 'Current Role'}</strong> to <strong>${state.userData.dreamRole || 'Dream Role'}</strong></p>
             </div>
             <button class="btn btn-outline" id="restart-btn">Start Over</button>
-        </div>
-    `;
+        </div >
+        `;
 }
 
 function renderCompaniesSection(companies) {
     if (!companies || !companies.list || companies.list.length === 0) return '';
 
     return `
-        <div class="companies-section animate-in">
+        < div class="companies-section animate-in" >
             <div class="section-header-inline">
                 <h2>🏢 Top Companies Hiring in ${companies.city}</h2>
                 <p>Based on your target role: <strong>${companies.roleCategory}</strong></p>
@@ -334,8 +377,8 @@ function renderCompaniesSection(companies) {
                 `).join('')}
             </div>
             ${companies.isGeneric ? `<p class="location-note">Note: Showing top tech companies globally as we refine matches for your specific location.</p>` : ''}
-        </div>
-    `;
+        </div >
+        `;
 }
 
 // ============================================
@@ -344,7 +387,7 @@ function renderCompaniesSection(companies) {
 function renderCoachingMessage(coaching) {
     if (!coaching) return '';
     return `
-        <div class="coaching-section animate-in">
+        < div class="coaching-section animate-in" >
             <div class="coaching-card">
                 <div class="coaching-emoji">${coaching.emoji}</div>
                 <h2 class="coaching-headline">${coaching.headline}</h2>
@@ -354,14 +397,14 @@ function renderCoachingMessage(coaching) {
                     <p>${coaching.encouragement}</p>
                 </div>
             </div>
-        </div>
-    `;
+        </div >
+        `;
 }
 
 function renderQuickWinsSection(quickWins) {
     if (!quickWins || !quickWins.length) return '';
     return `
-        <div class="quick-wins-section animate-in">
+        < div class="quick-wins-section animate-in" >
             <div class="section-header-inline">
                 <h2>⚡ Quick Wins - Start Today!</h2>
                 <p>Small actions that create immediate momentum</p>
@@ -379,14 +422,14 @@ function renderQuickWinsSection(quickWins) {
                     </div>
                 `).join('')}
             </div>
-        </div>
-    `;
+        </div >
+        `;
 }
 
 function renderWeeklyPlanSection(weeklyPlan) {
     if (!weeklyPlan) return '';
     return `
-        <div class="weekly-plan-section animate-in">
+        < div class="weekly-plan-section animate-in" >
             <div class="section-header-inline">
                 <h2>${weeklyPlan.thisWeek.title}</h2>
                 <p>Total commitment: ${weeklyPlan.thisWeek.totalHours} hours</p>
@@ -416,14 +459,14 @@ function renderWeeklyPlanSection(weeklyPlan) {
                     `).join('')}
                 </div>
             </div>
-        </div>
-    `;
+        </div >
+        `;
 }
 
 function renderDailyHabitsSection(dailyHabits) {
     if (!dailyHabits) return '';
     return `
-        <div class="daily-habits-section animate-in">
+        < div class="daily-habits-section animate-in" >
             <div class="section-header-inline">
                 <h2>🌅 Daily Success Habits</h2>
                 <p>Small daily actions that compound into massive results</p>
@@ -475,14 +518,14 @@ function renderDailyHabitsSection(dailyHabits) {
                     `).join('')}
                 </div>
             </div>
-        </div>
-    `;
+        </div >
+        `;
 }
 
 function renderInterviewPrepSection(interviewPrep) {
     if (!interviewPrep) return '';
     return `
-        <div class="interview-prep-section animate-in">
+        < div class="interview-prep-section animate-in" >
             <div class="section-header-inline">
                 <h2>🎤 Interview Preparation</h2>
                 <p>Common questions with frameworks and sample answers</p>
@@ -526,14 +569,14 @@ function renderInterviewPrepSection(interviewPrep) {
                     </div>
                 ` : ''}
             </div>
-        </div>
-    `;
+        </div >
+        `;
 }
 
 function renderNetworkingSection(networkingTemplates) {
     if (!networkingTemplates) return '';
     return `
-        <div class="networking-section animate-in">
+        < div class="networking-section animate-in" >
             <div class="section-header-inline">
                 <h2>🤝 Networking Templates</h2>
                 <p>Copy-paste messages that actually get responses</p>
@@ -552,14 +595,14 @@ function renderNetworkingSection(networkingTemplates) {
                     </div>
                 `).join('')}
             </div>
-        </div>
-    `;
+        </div >
+        `;
 }
 
 function renderSuccessStoriesSection(successStories) {
     if (!successStories || !successStories.length) return '';
     return `
-        <div class="success-stories-section animate-in">
+        < div class="success-stories-section animate-in" >
             <div class="section-header-inline">
                 <h2>🌟 Success Stories</h2>
                 <p>Real people who made this exact transition</p>
@@ -581,14 +624,14 @@ function renderSuccessStoriesSection(successStories) {
                     </div>
                 `).join('')}
             </div>
-        </div>
-    `;
+        </div >
+        `;
 }
 
 function renderMistakesSection(commonMistakes) {
     if (!commonMistakes) return '';
     return `
-        <div class="mistakes-section animate-in">
+        < div class="mistakes-section animate-in" >
             <div class="section-header-inline">
                 <h2>⚠️ Common Mistakes to Avoid</h2>
                 <p>Learn from others' errors - so you don't repeat them</p>
@@ -615,15 +658,16 @@ function renderMistakesSection(commonMistakes) {
                         ${commonMistakes.redFlagsInCompanies.map(f => `<li>${f}</li>`).join('')}
                     </ul>
                 </div>
-            ` : ''}
-        </div>
-    `;
+            ` : ''
+        }
+        </div >
+        `;
 }
 
 function renderBackupPlansSection(backupPlans) {
     if (!backupPlans) return '';
     return `
-        <div class="backup-plans-section animate-in">
+        < div class="backup-plans-section animate-in" >
             <div class="section-header-inline">
                 <h2>🛡️ Backup Plans</h2>
                 <p>Prepare for different scenarios - hope for the best, plan for everything</p>
@@ -648,14 +692,14 @@ function renderBackupPlansSection(backupPlans) {
                     </ul>
                 </div>
             </div>
-        </div>
-    `;
+        </div >
+        `;
 }
 
 function renderMotivationSection(motivation) {
     if (!motivation) return '';
     return `
-        <div class="motivation-section animate-in">
+        < div class="motivation-section animate-in" >
             <div class="section-header-inline">
                 <h2>💪 Stay Motivated</h2>
                 <p>Support for when things get tough</p>
@@ -689,14 +733,14 @@ function renderMotivationSection(motivation) {
                     `).join('')}
                 </div>
             </div>
-        </div>
-    `;
+        </div >
+        `;
 }
 
 function renderSalaryTipsSection(salaryTips) {
     if (!salaryTips) return '';
     return `
-        <div class="salary-tips-section animate-in">
+        < div class="salary-tips-section animate-in" >
             <div class="section-header-inline">
                 <h2>💰 Salary Negotiation</h2>
                 <p>Get paid what you're worth</p>
@@ -724,14 +768,14 @@ function renderSalaryTipsSection(salaryTips) {
                     ${salaryTips.statistics?.map(s => `<li>${s}</li>`).join('')}
                 </ul>
             </div>
-        </div>
-    `;
+        </div >
+        `;
 }
 
 function renderProgressTrackerSection(progressTracker) {
     if (!progressTracker) return '';
     return `
-        <div class="progress-tracker-section animate-in">
+        < div class="progress-tracker-section animate-in" >
             <div class="section-header-inline">
                 <h2>📊 Track Your Progress</h2>
                 <p>What gets measured gets managed</p>
@@ -760,14 +804,14 @@ function renderProgressTrackerSection(progressTracker) {
                     `).join('')}
                 </div>
             </div>
-        </div>
-    `;
+        </div >
+        `;
 }
 
 function renderFeasibilityScore(feasibility) {
     const angle = (feasibility.score / 100) * 180;
     return `
-        <div class="feasibility-section animate-in">
+        < div class="feasibility-section animate-in" >
             <div class="feasibility-gauge">
                 <div class="gauge-container">
                     <div class="gauge-bg"></div>
@@ -794,14 +838,14 @@ function renderFeasibilityScore(feasibility) {
                     `).join('')}
                 </div>
             </div>
-        </div>
-    `;
+        </div >
+        `;
 }
 
 function renderSummaryCards(analysis) {
     const { roadmap, financialAnalysis, riskAssessment } = analysis;
     return `
-        <div class="summary-cards animate-in">
+        < div class="summary-cards animate-in" >
             <div class="summary-card card-gradient-1">
                 <div class="summary-card-icon">🎯</div>
                 <div class="summary-card-content">
@@ -830,13 +874,13 @@ function renderSummaryCards(analysis) {
                     <span class="summary-card-value" style="color: var(--accent-${riskAssessment.level.color})">${riskAssessment.level.label}</span>
                 </div>
             </div>
-        </div>
-    `;
+        </div >
+        `;
 }
 
 function renderRoadmapSection(roadmap) {
     return `
-        <div class="roadmap-section animate-in">
+        < div class="roadmap-section animate-in" >
             <div class="section-header-inline">
                 <h2>📍 Your ${roadmap.totalMonths}-Month Transition Roadmap</h2>
                 <p>Week-by-week plan with ${roadmap.weeklyCommitment} hours/week commitment</p>
@@ -889,8 +933,8 @@ function renderRoadmapSection(roadmap) {
                     </div>
                 `).join('')}
             </div>
-        </div>
-    `;
+        </div >
+        `;
 }
 
 function getPhaseColor(index) {
@@ -900,7 +944,7 @@ function getPhaseColor(index) {
 
 function renderSkillGapSection(skillGap) {
     return `
-        <div class="skill-section animate-in">
+        < div class="skill-section animate-in" >
             <div class="section-header-inline">
                 <h2>🎓 Skill Gap Analysis</h2>
                 <p>Gap: ${skillGap.gapPercentage}% • Estimated learning time: ${skillGap.estimatedLearningMonths} months</p>
@@ -943,13 +987,13 @@ function renderSkillGapSection(skillGap) {
                 </div>
             </div>
             <p class="skill-summary">${skillGap.summary}</p>
-        </div>
-    `;
+        </div >
+        `;
 }
 
 function renderFinancialSection(financial) {
     return `
-        <div class="financial-section animate-in">
+        < div class="financial-section animate-in" >
             <div class="section-header-inline">
                 <h2>💰 Financial Runway Analysis</h2>
                 <p>Health Score: <span style="color: var(--accent-${financial.healthRating.color})">${financial.healthRating.icon} ${financial.healthRating.label}</span></p>
@@ -1007,14 +1051,15 @@ function renderFinancialSection(financial) {
                         `).join('')}
                     </div>
                 </div>
-            ` : ''}
-        </div>
-    `;
+            ` : ''
+        }
+        </div >
+        `;
 }
 
 function renderRiskSection(risk) {
     return `
-        <div class="risk-section animate-in">
+        < div class="risk-section animate-in" >
             <div class="section-header-inline">
                 <h2>🛡️ Risk Assessment</h2>
                 <p style="color: var(--accent-${risk.level.color})">${risk.level.label} - ${risk.level.advice}</p>
@@ -1033,13 +1078,13 @@ function renderRiskSection(risk) {
                     </div>
                 `).join('')}
             </div>
-        </div>
-    `;
+        </div >
+        `;
 }
 
 function renderAlternativesSection(alternatives) {
     return `
-        <div class="alternatives-section animate-in">
+        < div class="alternatives-section animate-in" >
             <h2>🔄 Alternative Career Paths</h2>
             <p class="section-subtitle">Other feasible transitions based on your profile</p>
             <div class="alternatives-grid">
@@ -1059,13 +1104,13 @@ function renderAlternativesSection(alternatives) {
                     </div>
                 `).join('')}
             </div>
-        </div>
-    `;
+        </div >
+        `;
 }
 
 function renderResourcesSection(resources) {
     const guidesHtml = resources.guides?.length ? `
-        <div class="guides-section">
+        < div class="guides-section" >
             <h3>📖 Step-by-Step Guides</h3>
             <div class="guides-grid">
                 ${resources.guides.slice(0, 4).map(guide => `
@@ -1114,11 +1159,11 @@ function renderResourcesSection(resources) {
                     </div>
                 `).join('')}
             </div>
-        </div>
-    ` : '';
+        </div >
+        ` : '';
 
     const coursesHtml = resources.courses?.length ? `
-        <div class="courses-section">
+        < div class="courses-section" >
             <h3>🎓 Recommended Courses</h3>
             <div class="courses-grid">
                 ${resources.courses.slice(0, 8).map(course => `
@@ -1141,11 +1186,11 @@ function renderResourcesSection(resources) {
                     </div>
                 `).join('')}
             </div>
-        </div>
-    ` : '';
+        </div >
+        ` : '';
 
     const booksHtml = resources.books?.length ? `
-        <div class="books-section">
+        < div class="books-section" >
             <h3>📚 Must-Read Books</h3>
             <div class="books-grid">
                 ${resources.books.slice(0, 6).map(book => `
@@ -1159,11 +1204,11 @@ function renderResourcesSection(resources) {
                     </div>
                 `).join('')}
             </div>
-        </div>
-    ` : '';
+        </div >
+        ` : '';
 
     const communitiesHtml = `
-        <div class="communities-section">
+        < div class="communities-section" >
             <h3>👥 Communities to Join</h3>
             <div class="communities-grid">
                 ${resources.communities.map(c => `
@@ -1174,11 +1219,11 @@ function renderResourcesSection(resources) {
                     </div>
                 `).join('')}
             </div>
-        </div>
-    `;
+        </div >
+        `;
 
     const learningPathHtml = resources.learningPath ? `
-        <div class="learning-path-section">
+        < div class="learning-path-section" >
             <h3>🗺️ Complete Learning Path: ${state.userData.dreamRole}</h3>
             <p class="path-meta">Duration: ${resources.learningPath.duration} • ${resources.learningPath.weeklyHours} hours/week</p>
             <div class="path-phases">
@@ -1214,11 +1259,11 @@ function renderResourcesSection(resources) {
                     </div>
                 `).join('')}
             </div>
-        </div>
-    ` : '';
+        </div >
+        ` : '';
 
     return `
-        <div class="resources-section animate-in">
+        < div class="resources-section animate-in" >
             <h2>📚 Learning Resources & Guides</h2>
             <p class="section-subtitle">Everything you need to successfully make this transition</p>
             ${learningPathHtml}
@@ -1226,13 +1271,13 @@ function renderResourcesSection(resources) {
             ${coursesHtml}
             ${booksHtml}
             ${communitiesHtml}
-        </div>
-    `;
+        </div >
+        `;
 }
 
 // Toggle guide expansion
 function toggleGuide(guideId) {
-    const guideContent = document.getElementById(`guide-${guideId}`);
+    const guideContent = document.getElementById(`guide - ${guideId} `);
     if (guideContent) {
         const isVisible = guideContent.style.display !== 'none';
         guideContent.style.display = isVisible ? 'none' : 'block';
@@ -1241,7 +1286,7 @@ function toggleGuide(guideId) {
 
 function renderDashboardCTA() {
     return `
-        <div class="dashboard-cta animate-in">
+        < div class="dashboard-cta animate-in" >
             <div class="cta-content">
                 <h3>Ready to take the first step?</h3>
                 <p>Your personalized roadmap is ready. Start with Phase 1 this week!</p>
@@ -1250,8 +1295,8 @@ function renderDashboardCTA() {
                 <button class="btn btn-primary" onclick="window.print()">📥 Print/Save Plan</button>
                 <button class="btn btn-secondary" onclick="shareResults()">📤 Share Plan</button>
             </div>
-        </div>
-    `;
+        </div >
+        `;
 }
 
 // ============================================
@@ -1259,10 +1304,10 @@ function renderDashboardCTA() {
 // ============================================
 function formatCurrency(amount) {
     if (!amount || amount === 0) return '₹0';
-    if (amount >= 10000000) return `₹${(amount / 10000000).toFixed(1)}Cr`;
-    if (amount >= 100000) return `₹${(amount / 100000).toFixed(1)}L`;
-    if (amount >= 1000) return `₹${(amount / 1000).toFixed(0)}K`;
-    return `₹${amount.toLocaleString('en-IN')}`;
+    if (amount >= 10000000) return `₹${(amount / 10000000).toFixed(1)} Cr`;
+    if (amount >= 100000) return `₹${(amount / 100000).toFixed(1)} L`;
+    if (amount >= 1000) return `₹${(amount / 1000).toFixed(0)} K`;
+    return `₹${amount.toLocaleString('en-IN')} `;
 }
 
 function observeElements() {

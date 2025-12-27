@@ -276,6 +276,14 @@
                         <input type="password" id="register-password" class="form-input" required
                             placeholder="••••••••">
                     </div>
+                    <div class="form-group term-group">
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="register-terms" required>
+                            <span class="checkmark"></span>
+                            I agree to the <a href="#" class="legal-link" data-doc="terms">Terms</a> and <a href="#"
+                                class="legal-link" data-doc="privacy">Privacy Policy</a>
+                        </label>
+                    </div>
                     <button type="submit" class="btn btn-primary btn-full">Sign Up</button>
                 </form>
             </div>
@@ -290,26 +298,46 @@
                 Continue with Google
             </button>
         </div>
-    </div>
-
-    <footer class="footer">
-        <div class="footer-container">
-            <div class="footer-brand">
-                <img src="logo.png" alt="CareerPivot Logo" class="logo-img">
-                <span class="logo-text">CareerPivot</span>
+        <!-- Legal Modal -->
+        <div id="legal-modal" class="modal">
+            <div class="modal-content glass wide">
+                <button class="modal-close"
+                    onclick="document.getElementById('legal-modal').classList.remove('active')">&times;</button>
+                <div id="legal-content-area" class="legal-scroll-area">
+                    <!-- Legal text will be injected here -->
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary"
+                        onclick="document.getElementById('legal-modal').classList.remove('active')">Close</button>
+                </div>
             </div>
-            <p class="footer-tagline">Your personalized career strategist</p>
-            <p class="footer-copyright">© 2024 CareerPivot. Built with ❤️</p>
         </div>
-    </footer>
-    <script src="knowledge-base.js"></script>
-    <script src="company-data.js"></script>
-    <script src="learning-resources.js"></script>
-    <script src="ai-support.js"></script>
-    <script src="ai-engine.js"></script>
-    <script type="module" src="auth.js"></script>
-    <script src="admin.js"></script>
-    <script src="script.js"></script>
+
+        <footer class="footer">
+            <div class="footer-container">
+                <div class="footer-brand">
+                    <img src="logo.png" alt="CareerPivot Logo" class="logo-img">
+                    <span class="logo-text">CareerPivot</span>
+                </div>
+                <p class="footer-tagline">Your personalized career strategist</p>
+                <div class="footer-legal">
+                    <a href="#" class="legal-link" data-doc="terms">Terms</a>
+                    <a href="#" class="legal-link" data-doc="privacy">Privacy</a>
+                    <a href="#" class="legal-link" data-doc="refund">Refund Policy</a>
+                    <a href="#" class="legal-link" data-doc="contact">Contact Us</a>
+                </div>
+                <p class="footer-copyright">© 2025 CareerPivot. All rights reserved.</p>
+            </div>
+        </footer>
+        <script src="knowledge-base.js"></script>
+        <script src="company-data.js"></script>
+        <script src="learning-resources.js"></script>
+        <script src="ai-support.js"></script>
+        <script src="ai-engine.js"></script>
+        <script src="legal-content.js"></script>
+        <script type="module" src="auth.js"></script>
+        <script src="admin.js"></script>
+        <script src="script.js"></script>
 </body>
 
 </html>
