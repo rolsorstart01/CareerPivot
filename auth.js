@@ -160,10 +160,21 @@ function initAuthUI() {
     let isSigningUp = false;
 
     // Modal Controls
-    loginBtn?.addEventListener('click', () => authModal?.classList.remove('hidden'));
-    closeAuth?.addEventListener('click', () => authModal?.classList.add('hidden'));
+    loginBtn?.addEventListener('click', () => {
+        authModal?.classList.remove('hidden');
+        authModal?.classList.add('active');
+    });
+
+    closeAuth?.addEventListener('click', () => {
+        authModal?.classList.add('hidden');
+        authModal?.classList.remove('active');
+    });
+
     window.addEventListener('click', (e) => {
-        if (e.target === authModal) authModal.classList.add('hidden');
+        if (e.target === authModal) {
+            authModal.classList.add('hidden');
+            authModal.classList.remove('active');
+        }
     });
 
     // Toggle logic for Login / Sign Up
