@@ -31,6 +31,8 @@ async function syncUserToState(user) {
 
     try {
         const adminEmail = "reyhansingh01@gmail.com";
+        const isHardcodedAdmin = user.email.toLowerCase() === adminEmail.toLowerCase();
+
         const userDocRef = doc(db, "users", user.uid);
         const userDoc = await getDoc(userDocRef);
 
@@ -38,23 +40,24 @@ async function syncUserToState(user) {
             const data = userDoc.data();
             window.state.userPlan = data.userPlan || 'starter';
             window.state.analysesUsed = data.analysesUsed || 0;
-            window.state.isAdmin = data.role === 'admin' || user.email === adminEmail;
+            window.state.isAdmin = data.role === 'admin' || isHardcodedAdmin;
 
-            if (user.email === adminEmail && data.role !== 'admin') {
+            if (isHardcodedAdmin && data.role !== 'admin') {
+                console.log("CareerPivot: Promoting hardcoded admin in Firestore...");
                 await setDoc(userDocRef, { role: 'admin' }, { merge: true });
             }
         } else {
-            const isInitialAdmin = user.email === adminEmail;
+            console.log("CareerPivot: Creating new user document...");
             await setDoc(userDocRef, {
                 email: user.email,
                 userPlan: 'starter',
                 analysesUsed: 0,
-                role: isInitialAdmin ? 'admin' : 'user',
+                role: isHardcodedAdmin ? 'admin' : 'user',
                 createdAt: new Date()
             });
             window.state.userPlan = 'starter';
             window.state.analysesUsed = 0;
-            window.state.isAdmin = isInitialAdmin;
+            window.state.isAdmin = isHardcodedAdmin;
         }
     } catch (error) {
         console.error("Firestore sync error:", error);
@@ -144,6 +147,7 @@ window.saveUserDataToCloud = async function () {
 
 // UI Initialization & Event Binding
 function initAuthUI() {
+    console.log("CareerPivot: Initializing Auth UI...");
     const loginBtn = document.getElementById('loginBtn');
     const googleLoginBtn = document.getElementById('googleLoginBtn');
     const logoutBtn = document.getElementById('logoutBtn');
@@ -157,13 +161,25 @@ function initAuthUI() {
     const authSubmit = document.getElementById('authSubmit');
     const termsGroup = document.getElementById('signup-terms-group');
 
+    console.log("CareerPivot: Elements found:", {
+        loginBtn: !!loginBtn,
+        authModal: !!authModal,
+        googleLoginBtn: !!googleLoginBtn
+    });
+
     let isSigningUp = false;
 
     // Modal Controls
-    loginBtn?.addEventListener('click', () => {
-        authModal?.classList.remove('hidden');
-        authModal?.classList.add('active');
-    });
+    if (loginBtn) {
+        loginBtn.addEventListener('click', (e) => {
+            console.log("CareerPivot: Login button clicked!");
+            e.preventDefault();
+            authModal?.classList.remove('hidden');
+            authModal?.classList.add('active');
+        });
+    } else {
+        console.warn("CareerPivot: loginBtn not found in DOM!");
+    }
 
     closeAuth?.addEventListener('click', () => {
         authModal?.classList.add('hidden');
