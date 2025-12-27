@@ -83,12 +83,16 @@ function updateAuthUI(user) {
     document.querySelectorAll('#nav-admin-btn').forEach(el => el.remove());
 
     if (user) {
-        // Toggle visibility immediately
+        // Atomic UI Toggle
         if (loginBtn) loginBtn.classList.add('hidden');
         if (profile) profile.classList.remove('hidden');
 
         if (profile) {
             if (avatar) {
+                // Set a placeholder while loading to avoid broken image icons
+                if (!avatar.src || avatar.src.includes('localhost') || avatar.src === window.location.href) {
+                    avatar.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+                }
                 const fallbackAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || user.email)}&background=667eea&color=fff`;
                 avatar.src = user.photoURL || fallbackAvatar;
             }
@@ -112,6 +116,7 @@ function updateAuthUI(user) {
             }
         }
     } else {
+        // Atomic UI Toggle
         if (loginBtn) loginBtn.classList.remove('hidden');
         if (profile) profile.classList.add('hidden');
     }
