@@ -79,17 +79,18 @@ async function syncUserToState(user) {
 // UI Updates
 function updateAuthUI(user) {
     const navLinks = document.querySelector('.nav-links');
+    if (!navLinks) return;
+
     if (user) {
-        // Remove ALL existing login buttons to prevent ghosting
+        // Remove ALL existing login buttons definitely
         document.querySelectorAll('#nav-login-btn').forEach(btn => btn.remove());
 
-        // Remove existing profile if any
-        const existingProfile = document.querySelector('.user-profile');
-        if (existingProfile) existingProfile.remove();
+        // Ensure we don't duplicate profile or admin links
+        document.querySelectorAll('.user-profile, #nav-admin-btn').forEach(el => el.remove());
 
         const profileHTML = `
             <div class="user-profile" id="user-profile-toggle">
-                <div class="user-avatar">${user.email[0].toUpperCase()}</div>
+                <div class="user-avatar">${(user.displayName || user.email)[0].toUpperCase()}</div>
                 <span class="user-email">${user.email}</span>
             </div>
         `;
@@ -123,8 +124,10 @@ function updateAuthUI(user) {
             }
         });
     } else {
-        // Show Login button again
-        if (!loginBtn && navLinks) {
+        // Sign out mode: ensure CLEAN navbar
+        document.querySelectorAll('.user-profile, #nav-admin-btn').forEach(el => el.remove());
+
+        if (!document.getElementById('nav-login-btn')) {
             const newLoginBtn = document.createElement('a');
             newLoginBtn.href = "#";
             newLoginBtn.className = "nav-link";
