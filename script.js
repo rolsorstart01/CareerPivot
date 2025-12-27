@@ -25,7 +25,9 @@ const state = {
         additionalNotes: ''
     },
     analysis: null,
-    ai: null
+    ai: null,
+    userPlan: localStorage.getItem('userPlan') || 'starter', // 'starter' or 'pro'
+    analysesUsed: parseInt(localStorage.getItem('analysesUsed')) || 0
 };
 
 // DOM Elements Cache
@@ -160,12 +162,23 @@ function updateRunwayCalculation() {
 // AI ANALYSIS & ROADMAP GENERATION
 // ============================================
 async function generateAIRoadmap() {
+    // Plan Enforcement Check
+    if (state.userPlan === 'starter' && state.analysesUsed >= 3) {
+        alert("You've reached the limit of 3 analyses on the Starter plan. Please upgrade to Pro for unlimited access!");
+        window.location.hash = 'pricing';
+        return;
+    }
+
     showLoadingOverlay();
 
     try {
         // Run AI analysis
         const analysis = await state.ai.analyzeCareerTransition(state.userData);
         state.analysis = analysis;
+
+        // Increment usage and persist
+        state.analysesUsed++;
+        localStorage.setItem('analysesUsed', state.analysesUsed);
 
         // Simulate progressive loading for UX
         await simulateProgress();
@@ -260,15 +273,15 @@ function renderDashboard(analysis) {
             ${renderSkillGapSection(analysis.skillGap)}
             ${renderDailyHabitsSection(analysis.dailyHabits)}
             ${renderFinancialSection(analysis.financialAnalysis)}
-            ${renderInterviewPrepSection(analysis.interviewPrep)}
-            ${renderNetworkingSection(analysis.networkingTemplates)}
+            ${state.userPlan === 'pro' ? renderInterviewPrepSection(analysis.interviewPrep) : renderLockedFeature('Interview Preparation')}
+            ${state.userPlan === 'pro' ? renderNetworkingSection(analysis.networkingTemplates) : renderLockedFeature('Networking Templates')}
             ${renderSuccessStoriesSection(analysis.successStories)}
             ${renderRiskSection(analysis.riskAssessment)}
-            ${renderMistakesSection(analysis.commonMistakes)}
+            ${state.userPlan === 'pro' ? renderMistakesSection(analysis.commonMistakes) : ''}
             ${renderBackupPlansSection(analysis.backupPlans)}
             ${renderAlternativesSection(analysis.alternatives)}
             ${renderMotivationSection(analysis.motivation)}
-            ${renderSalaryTipsSection(analysis.salaryTips)}
+            ${state.userPlan === 'pro' ? renderSalaryTipsSection(analysis.salaryTips) : ''}
             ${renderResourcesSection(analysis.resources)}
             ${renderProgressTrackerSection(analysis.progressTracker)}
             ${renderDashboardCTA()}
@@ -1429,3 +1442,94 @@ function renderWizardContent() {
 
 // Initialize on DOM ready
 document.addEventListener('DOMContentLoaded', init);
+
+// ============================================
+// RAZORPAY & DONATIONS
+// ============================================
+function handleDonation(amountInINR) {
+    const options = {
+        "key": "rzp_live_RuaMsQ3mGUXGtH",
+        "amount": amountInINR * 100, // Razorpay amount is in paise
+        "currency": "INR",
+        "name": "CareerPivot Support",
+        "description": "Donation for CareerPivot Mission",
+        "image": "logo.png",
+        "handler": function (response) {
+            alert("Thank you for your generous support! Payment ID: " + response.razorpay_payment_id);
+        },
+        "prefill": {
+            "name": "",
+            "email": ""
+        },
+        "theme": {
+            "color": "#f59e0b"
+        }
+    };
+    const rzp = new Razorpay(options);
+    rzp.open();
+}
+
+function handleUpgrade() {
+    const options = {
+        "key": "rzp_live_RuaMsQ3mGUXGtH",
+        "amount": 500 * 100, // ₹500 in paise
+        "currency": "INR",
+        "name": "CareerPivot Pro",
+        "description": "Unlock Unlimited AI Career Analyses",
+        "image": "logo.png",
+        "handler": function (response) {
+            state.userPlan = 'pro';
+            localStorage.setItem('userPlan', 'pro');
+            alert("Upgrade Successful! You now have unlimited access to CareerPivot Pro. Enjoy!");
+            if (document.body.classList.contains('dashboard-active') && state.analysis) {
+                renderDashboard(state.analysis);
+            }
+        },
+        "prefill": {
+            "name": "",
+            "email": ""
+        },
+        "theme": {
+            "color": "#f59e0b"
+        }
+    };
+    const rzp = new Razorpay(options);
+    rzp.open();
+}
+
+function handleCustomDonation() {
+    const amount = prompt("Enter the amount you wish to donate (INR):", "500");
+    if (amount && !isNaN(amount)) {
+        handleDonation(parseFloat(amount));
+    }
+}
+
+function renderLockedFeature(name) {
+    return `
+        <div class="locked-feature animate-in">
+            <div class="locked-card">
+                <div class="locked-icon">🔒</div>
+                <h3>${name} is a Pro Feature</h3>
+                <p>Upgrade to Pro to unlock deep career insights, interview preparation, and networking strategies.</p>
+                <button class="btn btn-primary" onclick="window.location.hash='pricing'">View Pro Plan</button>
+            </div>
+        </div>
+    `;
+}
+
+// Smooth scroll for nav links
+document.querySelectorAll('.nav-link[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        const href = this.getAttribute('href');
+        if (href === '#') return;
+
+        e.preventDefault();
+        const target = document.querySelector(href);
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+    });
+});
+

@@ -775,8 +775,258 @@ body.wizard-active .navbar {
     display: none;
 }
 
-body.dashboard-active .hero,
-body.dashboard-active .features-section,
 body.dashboard-active .how-section {
     display: none;
+}
+
+/* Pricing Section */
+.pricing-section {
+    padding: var(--space-3xl) var(--space-xl);
+    background: var(--bg-primary);
+}
+
+.pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: var(--space-xl);
+    margin-top: var(--space-2xl);
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+    justify-content: center;
+}
+
+.pricing-card {
+    background: var(--bg-glass);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-xl);
+    padding: var(--space-2xl);
+    display: flex;
+    flex-direction: column;
+    transition: all var(--transition-base);
+    position: relative;
+    backdrop-filter: blur(10px);
+}
+
+.pricing-card:hover {
+    transform: translateY(-8px);
+    border-color: var(--accent-gold);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.pricing-card.featured {
+    border: 2px solid var(--accent-gold);
+    background: rgba(245, 158, 11, 0.05);
+    transform: scale(1.05);
+    z-index: 10;
+}
+
+.pricing-card.featured:hover {
+    transform: scale(1.05) translateY(-8px);
+}
+
+.featured-badge {
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--gradient-gold);
+    color: #000;
+    padding: var(--space-xs) var(--space-lg);
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.pricing-header {
+    text-align: center;
+    margin-bottom: var(--space-xl);
+}
+
+.plan-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: var(--space-sm);
+    color: var(--text-primary);
+}
+
+.plan-price {
+    font-size: 3rem;
+    font-weight: 800;
+    font-family: var(--font-display);
+    color: var(--text-primary);
+}
+
+.plan-price .currency {
+    font-size: 1.5rem;
+    vertical-align: super;
+    margin-right: 2px;
+}
+
+.plan-price .period {
+    font-size: 1rem;
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
+.plan-features {
+    list-style: none;
+    margin-bottom: var(--space-2xl);
+    flex-grow: 1;
+}
+
+.plan-features li {
+    margin-bottom: var(--space-md);
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.plan-features li.disabled {
+    color: var(--text-muted);
+    text-decoration: line-through;
+}
+
+.feature-check {
+    font-weight: 700;
+}
+
+.pricing-card:not(.featured) .feature-check {
+    color: var(--accent-gold);
+}
+
+.btn-full {
+    width: 100%;
+    justify-content: center;
+}
+
+/* Support Section */
+.support-section {
+    padding: var(--space-3xl) var(--space-xl);
+}
+
+.support-card {
+    background: var(--bg-glass);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-lg);
+    padding: var(--space-3xl);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--space-2xl);
+    align-items: center;
+    max-width: 1000px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.support-title {
+    font-size: 2.5rem;
+    font-family: var(--font-display);
+    margin-bottom: var(--space-md);
+}
+
+.support-text {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-2xl);
+    max-width: 600px;
+}
+
+.donation-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+}
+
+.donation-btn {
+    padding: var(--space-md) var(--space-xl);
+    background: var(--bg-glass);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-lg);
+    color: var(--text-primary);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.donation-btn:hover {
+    background: var(--accent-rose);
+    border-color: var(--accent-rose);
+    color: #fff;
+    transform: scale(1.05);
+}
+
+.donation-custom {
+    border-style: dashed;
+}
+
+.support-icon {
+    font-size: 8rem;
+    opacity: 0.2;
+    animation: pulseHeart 4s infinite;
+}
+
+@keyframes pulseHeart {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 0.2;
+    }
+
+    50% {
+        transform: scale(1.1);
+        opacity: 0.3;
+    }
+}
+
+@media (max-width: 768px) {
+    .support-card {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .support-icon {
+        display: none;
+    }
+
+    .donation-options {
+        justify-content: center;
+    }
+}
+
+/* Locked Features - Plan Enforcement */
+.locked-feature {
+    margin: var(--space-xl) 0;
+}
+
+.locked-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 2px dashed rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-xl);
+    padding: var(--space-2xl);
+    text-align: center;
+    backdrop-filter: blur(10px);
+}
+
+.locked-icon {
+    font-size: 2.5rem;
+    margin-bottom: var(--space-md);
+    opacity: 0.5;
+}
+
+.locked-card h3 {
+    margin-bottom: var(--space-sm);
+    color: var(--text-secondary);
+}
+
+.locked-card p {
+    color: var(--text-muted);
+    margin-bottom: var(--space-xl);
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
 }
