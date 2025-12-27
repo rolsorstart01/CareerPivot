@@ -281,23 +281,13 @@ document.querySelectorAll('.legal-link').forEach(link => {
     });
 });
 
-// Update Registration logic to check T&C
-const originalRegisterSubmit = document.getElementById('register-form');
-if (originalRegisterSubmit) {
-    originalRegisterSubmit.addEventListener('submit', (e) => {
-        const termsCheckbox = document.getElementById('register-terms');
-        if (termsCheckbox && !termsCheckbox.checked) {
-            e.preventDefault();
-            e.stopPropagation();
-            alert("Please agree to the Terms and Conditions to proceed.");
-        }
-    }, true); // Use capture to intercept before auth.js
-}
+// Note: Terms acceptance check moved to auth.js for the new authModal system
 
 // Global modal close on background click
 window.addEventListener('click', (e) => {
     if (e.target.classList.contains('modal')) {
         e.target.classList.remove('active');
+        e.target.classList.add('hidden'); // For the new auth modal
     }
 });
 

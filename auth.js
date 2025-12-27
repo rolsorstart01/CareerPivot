@@ -16,6 +16,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const googleProvider = new GoogleAuthProvider();
 
 // State sync helper
 async function syncUserToState(user) {
@@ -30,8 +31,6 @@ async function syncUserToState(user) {
 
     try {
         const adminEmail = "reyhansingh01@gmail.com";
-
-        // Load from Firestore
         const userDocRef = doc(db, "users", user.uid);
         const userDoc = await getDoc(userDocRef);
 
@@ -41,12 +40,10 @@ async function syncUserToState(user) {
             window.state.analysesUsed = data.analysesUsed || 0;
             window.state.isAdmin = data.role === 'admin' || user.email === adminEmail;
 
-            // Ensure admin role is persisted if email matches but role is missing
             if (user.email === adminEmail && data.role !== 'admin') {
                 await setDoc(userDocRef, { role: 'admin' }, { merge: true });
             }
         } else {
-            // Init new user in Firestore
             const isInitialAdmin = user.email === adminEmail;
             await setDoc(userDocRef, {
                 email: user.email,
@@ -61,7 +58,6 @@ async function syncUserToState(user) {
         }
     } catch (error) {
         console.error("Firestore sync error:", error);
-        // Fallback to defaults if Firestore fails
         window.state.userPlan = 'starter';
         window.state.analysesUsed = 0;
         window.state.isAdmin = user.email === "reyhansingh01@gmail.com";
@@ -70,7 +66,6 @@ async function syncUserToState(user) {
     window.state.user = user;
     updateAuthUI(user);
 
-    // Refresh dashboard if active
     if (document.body.classList.contains('dashboard-active') && window.state.analysis) {
         window.renderDashboard(window.state.analysis);
     }
@@ -78,70 +73,47 @@ async function syncUserToState(user) {
 
 // UI Updates
 function updateAuthUI(user) {
+    const loginBtn = document.getElementById('loginBtn');
+    const profile = document.getElementById('userProfile');
+    const avatar = document.getElementById('userAvatar');
+    const name = document.getElementById('userName');
     const navLinks = document.querySelector('.nav-links');
-    if (!navLinks) return;
+
+    // Clean up any old admin links first
+    document.querySelectorAll('#nav-admin-btn').forEach(el => el.remove());
 
     if (user) {
-        // Remove ALL existing login buttons definitely
-        document.querySelectorAll('#nav-login-btn').forEach(btn => btn.remove());
+        // Toggle visibility immediately
+        if (loginBtn) loginBtn.classList.add('hidden');
+        if (profile) profile.classList.remove('hidden');
 
-        // Ensure we don't duplicate profile or admin links
-        document.querySelectorAll('.user-profile, #nav-admin-btn').forEach(el => el.remove());
-
-        const profileHTML = `
-            <div class="user-profile" id="user-profile-toggle">
-                <div class="user-avatar">${(user.displayName || user.email)[0].toUpperCase()}</div>
-                <span class="user-email">${user.email}</span>
-            </div>
-        `;
-        const profileContainer = document.createElement('div');
-        profileContainer.innerHTML = profileHTML;
-        const profileEl = profileContainer.firstElementChild;
-
-        // Add to nav before "Start Your Pivot"
-        const startBtn = document.getElementById('nav-start-btn');
-        navLinks.insertBefore(profileEl, startBtn);
-
-        // Add Admin Panel link if admin
-        if (window.state.isAdmin) {
-            const adminLink = document.createElement('a');
-            adminLink.href = "#";
-            adminLink.className = "nav-link admin-glow";
-            adminLink.id = "nav-admin-btn";
-            adminLink.textContent = "Admin Panel";
-            adminLink.style.color = "var(--accent-gold)";
-            navLinks.insertBefore(adminLink, profileEl);
-
-            adminLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                if (window.showAdminDashboard) window.showAdminDashboard();
-            });
-        }
-
-        profileEl.addEventListener('click', () => {
-            if (confirm('Do you want to logout?')) {
-                logout();
+        if (profile) {
+            if (avatar) {
+                const fallbackAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || user.email)}&background=667eea&color=fff`;
+                avatar.src = user.photoURL || fallbackAvatar;
             }
-        });
-    } else {
-        // Sign out mode: ensure CLEAN navbar
-        document.querySelectorAll('.user-profile, #nav-admin-btn').forEach(el => el.remove());
+            if (name) name.innerText = user.displayName || user.email.split('@')[0];
 
-        if (!document.getElementById('nav-login-btn')) {
-            const newLoginBtn = document.createElement('a');
-            newLoginBtn.href = "#";
-            newLoginBtn.className = "nav-link";
-            newLoginBtn.id = "nav-login-btn";
-            newLoginBtn.textContent = "Sign In";
+            // Re-inject Admin Panel if admin
+            if (window.state.isAdmin && navLinks) {
+                const adminLink = document.createElement('a');
+                adminLink.href = "#";
+                adminLink.className = "nav-link admin-glow";
+                adminLink.id = "nav-admin-btn";
+                adminLink.textContent = "Admin Panel";
+                adminLink.style.color = "var(--accent-gold)";
+                adminLink.style.marginRight = "1rem";
+                navLinks.insertBefore(adminLink, profile.parentElement);
 
-            const startBtn = document.getElementById('nav-start-btn');
-            navLinks.insertBefore(newLoginBtn, startBtn);
-
-            newLoginBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                showAuthModal();
-            });
+                adminLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (window.showAdminDashboard) window.showAdminDashboard();
+                });
+            }
         }
+    } else {
+        if (loginBtn) loginBtn.classList.remove('hidden');
+        if (profile) profile.classList.add('hidden');
     }
 }
 
@@ -154,7 +126,7 @@ onAuthStateChanged(auth, async (user) => {
     }
 });
 
-// Auth Persistence Helper (to be called from script.js)
+// Persistence Helper
 window.saveUserDataToCloud = async function () {
     if (window.state.user) {
         const userDocRef = doc(db, "users", window.state.user.uid);
@@ -165,81 +137,106 @@ window.saveUserDataToCloud = async function () {
     }
 };
 
-// Modal Logic
-const modal = document.getElementById('auth-modal');
-const closeBtn = document.getElementById('auth-close');
-const googleBtn = document.getElementById('google-login-btn');
-const tabs = document.querySelectorAll('.auth-tab');
-const loginForm = document.getElementById('login-form');
-const registerForm = document.getElementById('register-form');
+// UI Initialization & Event Binding
+function initAuthUI() {
+    const loginBtn = document.getElementById('loginBtn');
+    const googleLoginBtn = document.getElementById('googleLoginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const authModal = document.getElementById('authModal');
+    const closeAuth = document.getElementById('closeAuth');
+    const authForm = document.getElementById('emailAuthForm');
+    const showSignIn = document.getElementById('showSignIn');
+    const showSignUp = document.getElementById('showSignUp');
+    const authTitle = document.getElementById('authTitle');
+    const authSubtitle = document.getElementById('authSubtitle');
+    const authSubmit = document.getElementById('authSubmit');
+    const termsGroup = document.getElementById('signup-terms-group');
 
-function showAuthModal() {
-    modal.classList.add('active');
-}
+    let isSigningUp = false;
 
-function hideAuthModal() {
-    modal.classList.remove('active');
-}
-
-closeBtn?.addEventListener('click', hideAuthModal);
-window.addEventListener('click', (e) => { if (e.target === modal) hideAuthModal(); });
-
-tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-        tabs.forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-
-        const target = tab.dataset.tab;
-        document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
-        document.getElementById(`${target}-form`).classList.add('active');
+    // Modal Controls
+    loginBtn?.addEventListener('click', () => authModal?.classList.remove('hidden'));
+    closeAuth?.addEventListener('click', () => authModal?.classList.add('hidden'));
+    window.addEventListener('click', (e) => {
+        if (e.target === authModal) authModal.classList.add('hidden');
     });
-});
 
-// Auth Actions
-googleBtn?.addEventListener('click', async () => {
-    const provider = new GoogleAuthProvider();
-    try {
-        await signInWithPopup(auth, provider);
-        hideAuthModal();
-    } catch (error) {
-        alert(error.message);
-    }
-});
+    // Toggle logic for Login / Sign Up
+    showSignIn?.addEventListener('click', () => {
+        isSigningUp = false;
+        showSignIn.classList.add('active');
+        showSignUp?.classList.remove('active');
+        if (authTitle) authTitle.innerText = "Welcome Back";
+        if (authSubtitle) authSubtitle.innerText = "Continue your career transformation";
+        if (authSubmit) authSubmit.innerText = "Sign In";
+        if (termsGroup) termsGroup.style.display = 'none';
+        const termsInput = document.getElementById('register-terms');
+        if (termsInput) termsInput.required = false;
+    });
 
-loginForm?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = document.getElementById('login-email').value;
-    const pass = document.getElementById('login-password').value;
-    try {
-        await signInWithEmailAndPassword(auth, email, pass);
-        hideAuthModal();
-    } catch (error) {
-        alert(error.message);
-    }
-});
+    showSignUp?.addEventListener('click', () => {
+        isSigningUp = true;
+        showSignUp.classList.add('active');
+        showSignIn?.classList.remove('active');
+        if (authTitle) authTitle.innerText = "Create Account";
+        if (authSubtitle) authSubtitle.innerText = "Set up your personalized escape plan";
+        if (authSubmit) authSubmit.innerText = "Sign Up";
+        if (termsGroup) termsGroup.style.display = 'block';
+        const termsInput = document.getElementById('register-terms');
+        if (termsInput) termsInput.required = true;
+    });
 
-registerForm?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = document.getElementById('register-email').value;
-    const pass = document.getElementById('register-password').value;
-    try {
-        await createUserWithEmailAndPassword(auth, email, pass);
-        hideAuthModal();
-    } catch (error) {
-        alert(error.message);
-    }
-});
+    // Google Login Action
+    googleLoginBtn?.addEventListener('click', async () => {
+        try {
+            await signInWithPopup(auth, googleProvider);
+            authModal?.classList.add('hidden');
+        } catch (error) {
+            console.error("Google Auth error:", error);
+            alert(error.message);
+        }
+    });
 
-async function logout() {
-    try {
-        await signOut(auth);
-    } catch (error) {
-        console.error('Logout failed', error);
-    }
+    // Email/Password Action
+    authForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('authEmail').value;
+        const password = document.getElementById('authPassword').value;
+
+        if (isSigningUp) {
+            const termsBox = document.getElementById('register-terms');
+            if (termsBox && !termsBox.checked) {
+                alert("Please agree to the Terms and Privacy Policy to create an account.");
+                return;
+            }
+        }
+
+        try {
+            if (isSigningUp) {
+                await createUserWithEmailAndPassword(auth, email, password);
+            } else {
+                await signInWithEmailAndPassword(auth, email, password);
+            }
+            authModal?.classList.add('hidden');
+        } catch (error) {
+            console.error("Email Auth error:", error);
+            alert(error.message);
+        }
+    });
+
+    // Logout Action
+    logoutBtn?.addEventListener('click', async () => {
+        try {
+            await signOut(auth);
+        } catch (error) {
+            console.error("Logout error:", error);
+        }
+    });
 }
 
-// Initial binding for Login button
-document.getElementById('nav-login-btn')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    showAuthModal();
-});
+// Start listener
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAuthUI);
+} else {
+    initAuthUI();
+}
