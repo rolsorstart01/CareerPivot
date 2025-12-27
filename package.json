@@ -1,0 +1,28 @@
+{
+  "name": "careerpivot",
+  "version": "1.0.0",
+  "description": "CareerPivot AI is an advanced, AI-powered career strategy platform that helps users navigate complex career transitions. Unlike generic tools, it uses a custom built-in AI engine to analyze your current situation, target role, and local job market to provide a 100x more helpful roadmap.",
+  "main": "ai-engine.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rolsorstart01/CareerPivot.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rolsorstart01/CareerPivot/issues"
+  },
+  "homepage": "https://github.com/rolsorstart01/CareerPivot#readme",
+  "dependencies": {
+    "firebase": "^12.7.0"
+  },
+  "devDependencies": {
+    "vite": "^7.3.0"
+  }
+}

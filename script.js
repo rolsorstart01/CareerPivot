@@ -4,7 +4,7 @@
 // ============================================
 
 // State Management
-const state = {
+window.state = {
     currentStep: 1,
     totalSteps: 4,
     userData: {
@@ -26,9 +26,11 @@ const state = {
     },
     analysis: null,
     ai: null,
-    userPlan: localStorage.getItem('userPlan') || 'starter', // 'starter' or 'pro'
+    user: null, // Logged in user info
+    userPlan: localStorage.getItem('userPlan') || 'starter', // Fallback to local
     analysesUsed: parseInt(localStorage.getItem('analysesUsed')) || 0
 };
+const state = window.state;
 
 // DOM Elements Cache
 const elements = {};
@@ -179,6 +181,7 @@ async function generateAIRoadmap() {
         // Increment usage and persist
         state.analysesUsed++;
         localStorage.setItem('analysesUsed', state.analysesUsed);
+        if (window.saveUserDataToCloud) window.saveUserDataToCloud();
 
         // Simulate progressive loading for UX
         await simulateProgress();
@@ -259,7 +262,7 @@ function hideLoadingOverlay() {
 // ============================================
 // DASHBOARD RENDERING
 // ============================================
-function renderDashboard(analysis) {
+window.renderDashboard = function (analysis) {
     elements.dashboardSection.innerHTML = `
         <div class="dashboard-container">
             ${renderDashboardHeader(analysis)}
@@ -1480,6 +1483,7 @@ function handleUpgrade() {
         "handler": function (response) {
             state.userPlan = 'pro';
             localStorage.setItem('userPlan', 'pro');
+            if (window.saveUserDataToCloud) window.saveUserDataToCloud();
             alert("Upgrade Successful! You now have unlimited access to CareerPivot Pro. Enjoy!");
             if (document.body.classList.contains('dashboard-active') && state.analysis) {
                 renderDashboard(state.analysis);

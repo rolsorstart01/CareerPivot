@@ -37,6 +37,7 @@
                 <a href="#features" class="nav-link">Features</a>
                 <a href="#pricing" class="nav-link">Pricing</a>
                 <a href="#support" class="nav-link">Support</a>
+                <a href="#" class="nav-link" id="nav-login-btn">Sign In</a>
                 <a href="#" class="nav-link btn-outline" id="nav-start-btn">Start Your Pivot</a>
             </div>
         </div>
@@ -210,6 +211,86 @@
 
     <section class="wizard-section" id="wizard"></section>
     <section class="dashboard-section" id="dashboard"></section>
+    <section id="admin-dashboard" class="admin-section modal">
+        <div class="modal-content glass wide">
+            <button class="modal-close"
+                onclick="document.getElementById('admin-dashboard').classList.remove('active')">&times;</button>
+            <div class="section-header">
+                <span class="section-tag">Admin Dashboard</span>
+                <h2 class="section-title">Platform Overview</h2>
+            </div>
+
+            <div class="admin-stats-grid" id="admin-stats">
+                <!-- Data will be injected here -->
+                <div class="stat-card glass">
+                    <h3>Total Users</h3>
+                    <p id="total-users-stat">Loading...</p>
+                </div>
+                <div class="stat-card glass">
+                    <h3>Pro Users</h3>
+                    <p id="pro-users-stat">Loading...</p>
+                </div>
+            </div>
+
+            <div class="admin-user-list">
+                <h3>Recent Activity</h3>
+                <div id="admin-activity-list">
+                    <!-- Activity items -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="modal">
+        <div class="modal-content glass">
+            <button class="modal-close" id="auth-close">&times;</button>
+            <div class="auth-tabs">
+                <button class="auth-tab active" data-tab="login">Login</button>
+                <button class="auth-tab" data-tab="register">Sign Up</button>
+            </div>
+
+            <div class="auth-forms">
+                <!-- Login Form -->
+                <form id="login-form" class="auth-form active">
+                    <div class="form-group">
+                        <label for="login-email">Email Address</label>
+                        <input type="email" id="login-email" class="form-input" required placeholder="name@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" class="form-input" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">Login</button>
+                </form>
+
+                <!-- Register Form -->
+                <form id="register-form" class="auth-form">
+                    <div class="form-group">
+                        <label for="register-email">Email Address</label>
+                        <input type="email" id="register-email" class="form-input" required
+                            placeholder="name@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password">Password</label>
+                        <input type="password" id="register-password" class="form-input" required
+                            placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">Sign Up</button>
+                </form>
+            </div>
+
+            <div class="auth-divider">
+                <span>OR</span>
+            </div>
+
+            <button id="google-login-btn" class="btn btn-secondary btn-full btn-google">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google Logo"
+                    class="google-logo">
+                Continue with Google
+            </button>
+        </div>
+    </div>
 
     <footer class="footer">
         <div class="footer-container">
@@ -226,6 +307,8 @@
     <script src="learning-resources.js"></script>
     <script src="ai-support.js"></script>
     <script src="ai-engine.js"></script>
+    <script type="module" src="auth.js"></script>
+    <script src="admin.js"></script>
     <script src="script.js"></script>
 </body>
 
