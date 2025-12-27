@@ -1493,6 +1493,7 @@
     margin-bottom: var(--space-md);
     background: var(--gradient-gold);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
