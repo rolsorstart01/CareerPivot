@@ -28,35 +28,43 @@ async function syncUserToState(user) {
         return;
     }
 
-    const adminEmail = "reyhansingh01@gmail.com";
+    try {
+        const adminEmail = "reyhansingh01@gmail.com";
 
-    // Load from Firestore
-    const userDocRef = doc(db, "users", user.uid);
-    const userDoc = await getDoc(userDocRef);
+        // Load from Firestore
+        const userDocRef = doc(db, "users", user.uid);
+        const userDoc = await getDoc(userDocRef);
 
-    if (userDoc.exists()) {
-        const data = userDoc.data();
-        window.state.userPlan = data.userPlan || 'starter';
-        window.state.analysesUsed = data.analysesUsed || 0;
-        window.state.isAdmin = data.role === 'admin' || user.email === adminEmail;
+        if (userDoc.exists()) {
+            const data = userDoc.data();
+            window.state.userPlan = data.userPlan || 'starter';
+            window.state.analysesUsed = data.analysesUsed || 0;
+            window.state.isAdmin = data.role === 'admin' || user.email === adminEmail;
 
-        // Ensure admin role is persisted if email matches but role is missing
-        if (user.email === adminEmail && data.role !== 'admin') {
-            await setDoc(userDocRef, { role: 'admin' }, { merge: true });
+            // Ensure admin role is persisted if email matches but role is missing
+            if (user.email === adminEmail && data.role !== 'admin') {
+                await setDoc(userDocRef, { role: 'admin' }, { merge: true });
+            }
+        } else {
+            // Init new user in Firestore
+            const isInitialAdmin = user.email === adminEmail;
+            await setDoc(userDocRef, {
+                email: user.email,
+                userPlan: 'starter',
+                analysesUsed: 0,
+                role: isInitialAdmin ? 'admin' : 'user',
+                createdAt: new Date()
+            });
+            window.state.userPlan = 'starter';
+            window.state.analysesUsed = 0;
+            window.state.isAdmin = isInitialAdmin;
         }
-    } else {
-        // Init new user in Firestore
-        const isInitialAdmin = user.email === adminEmail;
-        await setDoc(userDocRef, {
-            email: user.email,
-            userPlan: 'starter',
-            analysesUsed: 0,
-            role: isInitialAdmin ? 'admin' : 'user',
-            createdAt: new Date()
-        });
+    } catch (error) {
+        console.error("Firestore sync error:", error);
+        // Fallback to defaults if Firestore fails
         window.state.userPlan = 'starter';
         window.state.analysesUsed = 0;
-        window.state.isAdmin = isInitialAdmin;
+        window.state.isAdmin = user.email === "reyhansingh01@gmail.com";
     }
 
     window.state.user = user;
@@ -71,10 +79,9 @@ async function syncUserToState(user) {
 // UI Updates
 function updateAuthUI(user) {
     const navLinks = document.querySelector('.nav-links');
-    const loginBtn = document.getElementById('nav-login-btn');
-
     if (user) {
-        if (loginBtn) loginBtn.remove();
+        // Remove ALL existing login buttons to prevent ghosting
+        document.querySelectorAll('#nav-login-btn').forEach(btn => btn.remove());
 
         // Remove existing profile if any
         const existingProfile = document.querySelector('.user-profile');
@@ -137,7 +144,11 @@ function updateAuthUI(user) {
 
 // Auth Lifecycle
 onAuthStateChanged(auth, async (user) => {
-    await syncUserToState(user);
+    try {
+        await syncUserToState(user);
+    } catch (error) {
+        console.error("Auth state change error:", error);
+    }
 });
 
 // Auth Persistence Helper (to be called from script.js)
