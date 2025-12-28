@@ -261,6 +261,21 @@ function initAuthUI() {
         }
     });
 
+    // Error Message Helper
+    function getFriendlyErrorMessage(error) {
+        const code = error.code;
+        if (code === 'auth/invalid-credential' || code === 'auth/wrong-password' || code === 'auth/user-not-found') {
+            return "Invalid email or password. Please try again.";
+        }
+        if (code === 'auth/email-already-in-use') {
+            return "This email is already registered. Try logging in.";
+        }
+        if (code === 'auth/too-many-requests') {
+            return "Too many failed attempts. Please try again later.";
+        }
+        return error.message; // Fallback to raw message if unknown
+    }
+
     // Email/Password Action
     authForm?.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -279,7 +294,8 @@ function initAuthUI() {
 
         try {
             authSubmit.classList.add('btn-loading');
-            authSubmit.innerText = ""; // Clear text for spinner
+            authSubmit.innerText = "";
+            authSubmit.disabled = true; // Prevent double click
 
             if (isSigningUp) {
                 await createUserWithEmailAndPassword(auth, email, password);
@@ -289,10 +305,11 @@ function initAuthUI() {
             authModal?.classList.add('hidden');
         } catch (error) {
             console.error("Email Auth error:", error);
-            alert(error.message);
+            alert(getFriendlyErrorMessage(error));
         } finally {
             authSubmit.classList.remove('btn-loading');
             authSubmit.innerText = originalText;
+            authSubmit.disabled = false;
         }
     });
 
