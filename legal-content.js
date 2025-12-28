@@ -59,9 +59,9 @@ window.legalDocs = {
         <h2>Contact Us</h2>
         <p>If you have any questions about our policies or service, please reach out to us:</p>
         <ul>
-            <li><strong>Email:</strong> support@careerpivot.io</li>
+            <li><strong>Email:</strong> reyhansingh01@gmail.com</li>
             <li><strong>Admin:</strong> reyhansingh01@gmail.com</li>
-            <li><strong>Location:</strong> Bengaluru, Karnataka, India</li>
+            <li><strong>Location:</strong> Kolkata, West Bengal, India</li>
         </ul>
         <p>Response time is typically 24-48 business hours.</p>
     `
