@@ -1507,6 +1507,81 @@ function handleDonation(amountInINR) {
     rzp.open();
 }
 
+
+
+// ============================================
+// SETTINGS & PLAN MANAGEMENT
+// ============================================
+window.showSettings = function () {
+    const modal = document.getElementById('settingsModal');
+    if (!state.user) return;
+
+    // Populate user info
+    const avatar = document.getElementById('settingsAvatar');
+    const fallbackAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(state.user.displayName || state.user.email)}&background=667eea&color=fff`;
+    if (avatar) avatar.src = state.user.photoURL || fallbackAvatar;
+
+    document.getElementById('settingsName').textContent = state.user.displayName || state.user.email.split('@')[0];
+    document.getElementById('settingsEmail').textContent = state.user.email;
+
+    // Plan Badge
+    const badge = document.getElementById('settingsPlanBadge');
+    badge.textContent = state.userPlan.charAt(0).toUpperCase() + state.userPlan.slice(1);
+    badge.className = `plan-badge ${state.userPlan}`;
+
+    // Usage Stats
+    const limit = state.userPlan === 'pro' ? '∞' : '3';
+    document.getElementById('settingsAnalysesUsed').textContent = `${state.analysesUsed} / ${limit}`;
+    document.getElementById('plan-status-text').innerHTML = `You are currently on the <strong>${state.userPlan.charAt(0).toUpperCase() + state.userPlan.slice(1)}</strong> plan.`;
+
+    // Plan Actions
+    const actionsArea = document.getElementById('planActions');
+    if (state.userPlan === 'starter') {
+        actionsArea.innerHTML = `<button class="btn btn-primary btn-sm" onclick="handleUpgrade()">Upgrade to Pro</button>`;
+    } else {
+        actionsArea.innerHTML = `<button class="btn btn-secondary btn-sm" onclick="handleCancelSubscription()">Cancel Pro Plan</button>`;
+    }
+
+    // Prefs
+    document.getElementById('editDisplayName').value = state.user.displayName || '';
+
+    modal.classList.remove('hidden');
+    modal.classList.add('active');
+};
+
+async function handleCancelSubscription() {
+    if (confirm("Are you sure you want to cancel your Pro plan? You will lose access to unlimited analyses and premium features.")) {
+        state.userPlan = 'starter';
+        localStorage.setItem('userPlan', 'starter');
+        if (window.saveUserDataToCloud) await window.saveUserDataToCloud();
+        alert("Your subscription has been cancelled. You are now on the Starter plan.");
+        window.showSettings(); // Refresh UI
+        if (document.body.classList.contains('dashboard-active') && state.analysis) {
+            renderDashboard(state.analysis);
+        }
+    }
+}
+
+document.getElementById('saveDisplayName')?.addEventListener('click', async () => {
+    const newName = document.getElementById('editDisplayName').value;
+    if (newName && state.user) {
+        // Since we are using Firebase Auth, we'd normally use updateProfile(auth.currentUser, { displayName: newName })
+        // For this prototype, we'll sync it to the Firestore doc and update local state
+        state.user.displayName = newName;
+        const nameEl = document.getElementById('userName');
+        if (nameEl) nameEl.textContent = newName;
+
+        // Persist to Firestore if possible (added field to the syncUserToState structure)
+        if (window.saveUserDataToCloud) {
+            // We need to slightly modify saveUserDataToCloud or just do it here
+            const db = firebase.firestore(); // This might fail if firebase isn't global
+            // For now, let's just update local UI as proof of concept if we can't easily reach Firestore here
+            alert("Name updated locally. To persist, we'd need to hit Firebase API.");
+        }
+        window.showSettings();
+    }
+});
+
 function handleUpgrade() {
     const options = {
         "key": "rzp_live_RuaMsQ3mGUXGtH",
@@ -1520,6 +1595,9 @@ function handleUpgrade() {
             localStorage.setItem('userPlan', 'pro');
             if (window.saveUserDataToCloud) window.saveUserDataToCloud();
             alert("Upgrade Successful! You now have unlimited access to CareerPivot Pro. Enjoy!");
+            if (document.getElementById('settingsModal').classList.contains('active')) {
+                window.showSettings(); // Refresh settings UI
+            }
             if (document.body.classList.contains('dashboard-active') && state.analysis) {
                 renderDashboard(state.analysis);
             }

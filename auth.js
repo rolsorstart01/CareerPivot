@@ -181,6 +181,22 @@ function initAuthUI() {
         console.warn("CareerPivot: loginBtn not found in DOM!");
     }
 
+    const settingsBtn = document.getElementById('settingsBtn');
+    if (settingsBtn) {
+        settingsBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (window.showSettings) window.showSettings();
+        });
+    }
+
+    const closeSettings = document.getElementById('closeSettings');
+    if (closeSettings) {
+        closeSettings.addEventListener('click', () => {
+            document.getElementById('settingsModal')?.classList.add('hidden');
+            document.getElementById('settingsModal')?.classList.remove('active');
+        });
+    }
+
     closeAuth?.addEventListener('click', () => {
         authModal?.classList.add('hidden');
         authModal?.classList.remove('active');

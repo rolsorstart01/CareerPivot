@@ -41,7 +41,11 @@
                     <div id="userProfile" class="user-profile hidden">
                         <img id="userAvatar" src="" alt="User">
                         <span id="userName"></span>
-                        <button id="logoutBtn" class="logout-btn">Sign Out</button>
+                        <div class="user-menu" style="display: flex; gap: 0.5rem; align-items: center;">
+                            <button id="settingsBtn" class="settings-btn"
+                                style="background: none; border: 1px solid var(--accent-gold); color: var(--accent-gold); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; cursor: pointer;">Settings</button>
+                            <button id="logoutBtn" class="logout-btn">Sign Out</button>
+                        </div>
                     </div>
                     <button id="loginBtn" class="login-btn">
                         Login / Sign Up
@@ -304,6 +308,58 @@
                 </svg>
                 Continue with Google
             </button>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal hidden">
+        <div class="modal-content settings-modal-card glass">
+            <button class="close-modal" id="closeSettings">&times;</button>
+            <div class="settings-header">
+                <div class="settings-user-info">
+                    <img id="settingsAvatar" src="" alt="User" class="settings-avatar-large">
+                    <div class="settings-user-text">
+                        <h2 id="settingsName">User Name</h2>
+                        <p id="settingsEmail">user@example.com</p>
+                    </div>
+                </div>
+                <div id="settingsPlanBadge" class="plan-badge starter">Starter</div>
+            </div>
+
+            <div class="settings-sections">
+                <div class="settings-section">
+                    <h3>Subscription & Plan</h3>
+                    <div class="plan-card-mini">
+                        <div class="plan-details-area">
+                            <div id="plan-status-text">You are currently on the <strong>Starter</strong> plan.</div>
+                            <div class="usage-stats">
+                                <div class="stat-mini">
+                                    <span class="stat-label">Analyses Used:</span>
+                                    <span id="settingsAnalysesUsed" class="stat-value">0 / 3</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="plan-actions" id="planActions">
+                            <!-- Dynamically injected -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3>Account Preferences</h3>
+                    <div class="preference-item">
+                        <label>Display Name</label>
+                        <div class="input-with-action">
+                            <input type="text" id="editDisplayName" placeholder="Enter name">
+                            <button class="btn-text" id="saveDisplayName">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-footer">
+                <p class="footer-note">Manage your subscription and account settings</p>
+            </div>
         </div>
     </div>
 
