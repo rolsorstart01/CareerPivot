@@ -34,16 +34,7 @@ async function fetchUsers() {
     try {
         const { collection, getDocs } = window.firestore;
 
-        // Create a timeout promise
-        const timeout = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error("Request timed out")), 5000)
-        );
-
-        // Race fetching against timeout
-        const querySnapshot = await Promise.race([
-            getDocs(collection(window.db, "users")),
-            timeout
-        ]);
+        const querySnapshot = await getDocs(collection(window.db, "users"));
 
         tableBody.innerHTML = '';
 
@@ -80,7 +71,6 @@ async function fetchUsers() {
     } catch (error) {
         console.error("Error fetching users:", error);
         let msg = "Error loading users.";
-        if (error.message === "Request timed out") msg = "Connection timed out. Check internet.";
         if (error.code === 'permission-denied') msg = "Access Denied: Admins Only.";
 
         tableBody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: var(--danger);">${msg}</td></tr>`;
