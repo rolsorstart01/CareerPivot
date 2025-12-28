@@ -18,6 +18,11 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
 
+// Expose to window for admin.js
+window.db = db;
+import * as firestore from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+window.firestore = firestore;
+
 // State sync helper
 async function syncUserToState(user) {
     if (!user) {
@@ -38,24 +43,24 @@ async function syncUserToState(user) {
 
         if (userDoc.exists()) {
             const data = userDoc.data();
-            window.state.userPlan = data.userPlan || 'starter';
+            window.state.userPlan = isHardcodedAdmin ? 'pro' : (data.userPlan || 'starter');
             window.state.analysesUsed = data.analysesUsed || 0;
             window.state.isAdmin = data.role === 'admin' || isHardcodedAdmin;
 
-            if (isHardcodedAdmin && data.role !== 'admin') {
-                console.log("CareerPivot: Promoting hardcoded admin in Firestore...");
-                await setDoc(userDocRef, { role: 'admin' }, { merge: true });
+            if (isHardcodedAdmin && (data.role !== 'admin' || data.userPlan !== 'pro')) {
+                console.log("CareerPivot: Promoting hardcoded admin and setting Pro plan in Firestore...");
+                await setDoc(userDocRef, { role: 'admin', userPlan: 'pro' }, { merge: true });
             }
         } else {
             console.log("CareerPivot: Creating new user document...");
             await setDoc(userDocRef, {
                 email: user.email,
-                userPlan: 'starter',
+                userPlan: isHardcodedAdmin ? 'pro' : 'starter',
                 analysesUsed: 0,
                 role: isHardcodedAdmin ? 'admin' : 'user',
                 createdAt: new Date()
             });
-            window.state.userPlan = 'starter';
+            window.state.userPlan = isHardcodedAdmin ? 'pro' : 'starter';
             window.state.analysesUsed = 0;
             window.state.isAdmin = isHardcodedAdmin;
         }

@@ -1318,6 +1318,70 @@ body.dashboard-active .how-section {
     color: var(--text-primary);
 }
 
+/* Admin Table Styles */
+.admin-table-container {
+    overflow-x: auto;
+    margin: var(--space-xl) 0;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.admin-user-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.9rem;
+}
+
+.admin-user-table th {
+    padding: var(--space-md) var(--space-lg);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.05);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+}
+
+.admin-user-table td {
+    padding: var(--space-md) var(--space-lg);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.plan-badge-mini {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+.plan-badge-mini.starter {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-muted);
+}
+
+.plan-badge-mini.pro {
+    background: var(--gradient-gold);
+    color: #000;
+}
+
+.btn-toggle-plan {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    padding: 4px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+}
+
+.btn-toggle-plan:hover {
+    background: var(--accent-gold);
+    color: #000;
+    border-color: var(--accent-gold);
+}
+
 .legal-scroll-area {
     max-height: 60vh;
     overflow-y: auto;
