@@ -250,11 +250,14 @@ function initAuthUI() {
     // Google Login Action
     googleLoginBtn?.addEventListener('click', async () => {
         try {
+            googleLoginBtn.classList.add('btn-loading');
             await signInWithPopup(auth, googleProvider);
             authModal?.classList.add('hidden');
         } catch (error) {
             console.error("Google Auth error:", error);
             alert(error.message);
+        } finally {
+            googleLoginBtn.classList.remove('btn-loading');
         }
     });
 
@@ -272,7 +275,12 @@ function initAuthUI() {
             }
         }
 
+        const originalText = authSubmit.innerText;
+
         try {
+            authSubmit.classList.add('btn-loading');
+            authSubmit.innerText = ""; // Clear text for spinner
+
             if (isSigningUp) {
                 await createUserWithEmailAndPassword(auth, email, password);
             } else {
@@ -282,6 +290,9 @@ function initAuthUI() {
         } catch (error) {
             console.error("Email Auth error:", error);
             alert(error.message);
+        } finally {
+            authSubmit.classList.remove('btn-loading');
+            authSubmit.innerText = originalText;
         }
     });
 

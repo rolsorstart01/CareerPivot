@@ -22,10 +22,35 @@ async function fetchUsers() {
     const tableBody = document.getElementById('admin-user-table-body');
     if (!tableBody) return;
 
+    // Check DB Connection
+    if (!window.db) {
+        console.error("CareerPivot: DB not initialized.");
+        tableBody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: var(--danger);">Database not connected. Try refreshing.</td></tr>';
+        return;
+    }
+
+    tableBody.innerHTML = '<tr><td colspan="3" style="text-align: center;">Loading users...</td></tr>';
+
     try {
         const { collection, getDocs } = window.firestore;
-        const querySnapshot = await getDocs(collection(window.db, "users"));
+
+        // Create a timeout promise
+        const timeout = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error("Request timed out")), 5000)
+        );
+
+        // Race fetching against timeout
+        const querySnapshot = await Promise.race([
+            getDocs(collection(window.db, "users")),
+            timeout
+        ]);
+
         tableBody.innerHTML = '';
+
+        if (querySnapshot.empty) {
+            tableBody.innerHTML = '<tr><td colspan="3" style="text-align: center;">No users found.</td></tr>';
+            return;
+        }
 
         let totalUsers = 0;
         let proUsers = 0;
@@ -54,7 +79,11 @@ async function fetchUsers() {
 
     } catch (error) {
         console.error("Error fetching users:", error);
-        tableBody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: var(--danger);">Error loading users.</td></tr>';
+        let msg = "Error loading users.";
+        if (error.message === "Request timed out") msg = "Connection timed out. Check internet.";
+        if (error.code === 'permission-denied') msg = "Access Denied: Admins Only.";
+
+        tableBody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: var(--danger);">${msg}</td></tr>`;
     }
 }
 
