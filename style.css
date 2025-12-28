@@ -58,6 +58,10 @@
     --transition-slow: 400ms ease;
 }
 
+.hidden {
+    display: none !important;
+}
+
 /* Reset */
 *,
 *::before,
