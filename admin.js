@@ -2,7 +2,7 @@
 // CareerPivot - Admin Dashboard Logic
 // ============================================
 
-const { collection, getDocs, updateDoc, doc } = window.firestore;
+// const { collection, getDocs, updateDoc, doc } = window.firestore; // Moved inside functions to avoid startup race condition
 
 window.showAdminDashboard = async function () {
     if (!window.state.isAdmin) {
@@ -23,6 +23,7 @@ async function fetchUsers() {
     if (!tableBody) return;
 
     try {
+        const { collection, getDocs } = window.firestore;
         const querySnapshot = await getDocs(collection(window.db, "users"));
         tableBody.innerHTML = '';
 
@@ -62,6 +63,7 @@ window.toggleUserPlan = async function (uid, currentPlan) {
     if (!confirm(`Change user plan to ${newPlan.toUpperCase()}?`)) return;
 
     try {
+        const { doc, updateDoc } = window.firestore;
         const userRef = doc(window.db, "users", uid);
         await updateDoc(userRef, {
             userPlan: newPlan

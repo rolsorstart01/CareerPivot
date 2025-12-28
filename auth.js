@@ -36,7 +36,15 @@ async function syncUserToState(user) {
 
     try {
         const adminEmail = "reyhansingh01@gmail.com";
-        const isHardcodedAdmin = user.email.toLowerCase() === adminEmail.toLowerCase();
+        const email = user.email ? user.email.toLowerCase() : '';
+        const isHardcodedAdmin = email === adminEmail.toLowerCase();
+
+        console.log("CareerPivot Debug: Login Sync", {
+            email,
+            adminEmail,
+            isHardcodedAdmin,
+            uid: user.uid
+        });
 
         const userDocRef = doc(db, "users", user.uid);
         const userDoc = await getDoc(userDocRef);
